@@ -193,13 +193,13 @@ int main(int argc, char *argv[])
         total_response_time += current_time - p->arrival_time; // calculate response time and update total count
       }
       
-      if (p->running_at_a_time > 0)
+      if (p->running_at_a_time > 0 && p->remaining_time > 0)
       {
         p->running_at_a_time --; // run for one time slice
         current_time++;
         p->remaining_time --;
       }
-      else if (p->running_at_a_time == 0) // finished the time slice
+      if (p->running_at_a_time == 0 || p->remaining_time == 0) // finished the time slice or finished the whole process
       {
         if (p->remaining_time > 0) // if the process didn't finish
         {
