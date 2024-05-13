@@ -23,6 +23,7 @@ struct process
   /* Additional fields here */
   u32 remaining_time;
   bool in_queue;
+  u32 running_at_a_time;
   /* End of "Additional fields here" */
 };
 
@@ -169,6 +170,7 @@ int main(int argc, char *argv[])
   {
     data[i].remaining_time = data[i].burst_time; // initialize remaining time for all processes
     data[i].in_queue = 0; // none are in the queue in the beginning
+    data[i].running_at_a_time = quantum_length;
   }
     
   while (completed_processes < size) 
@@ -190,28 +192,31 @@ int main(int argc, char *argv[])
       {
         total_response_time += current_time - p->arrival_time; // calculate response time and update total count
       }
-            
-      u32 execution_time = 0;
-      if (p->remaining_time < quantum_length) // if you can finish said process in the given time slice
-        execution_time = p->remaining_time;
-      else execution_time = quantum_length; // or not
-
-      p->remaining_time -= execution_time; // calculate remaining time after this slice
-      current_time += execution_time; // update current time
-            
-      if (p->remaining_time > 0) 
+      
+      if (p->running_at_a_time > 0)
       {
-        TAILQ_REMOVE(&list, p, pointers);
-        TAILQ_INSERT_TAIL(&list, p, pointers); // add process back to the end of the queue if it hasn't finished
-        p->in_queue = 1;
-      } 
-      else // if the process finished
-      {
-        total_waiting_time += current_time - p->arrival_time - p->burst_time; // calculate waiting time and update total count
-        completed_processes++;
-        TAILQ_REMOVE(&list, p, pointers); // remove from queue
-        p->in_queue = 0;
+        p->running_at_a_time --; // run for one time slice
+        current_time+;
+        p->remaining_time --;
       }
+      else if (p->running_at_a_time = 0) // finished the time slice
+      {
+        if (p->remaining_time > 0) // if the process didn't finish
+        {
+          TAILQ_REMOVE(&list, p, pointers);
+          TAILQ_INSERT_TAIL(&list, p, pointers); // add process back to the end of the queue if it hasn't finished
+          p->in_queue = 1;
+        } 
+        else // if the process finished
+        {
+          total_waiting_time += current_time - p->arrival_time - p->burst_time; // calculate waiting time and update total count
+          completed_processes++;
+          TAILQ_REMOVE(&list, p, pointers); // remove from queue
+          p->in_queue = 0;
+        }
+        p->running_at_a_time = quantum_length; // update new running_at_a_time for this process for next time it runs
+      }
+            
     } else current_time++; // if ready queue is empty, move to the next time unit
   }
   
