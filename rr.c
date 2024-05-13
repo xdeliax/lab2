@@ -203,7 +203,7 @@ int main(int argc, char *argv[])
       } 
       else // if the process finished
       {
-        total_waiting_time += current_time - p->arrival_time; // calculate waiting time and update total count
+        total_waiting_time += current_time - p->arrival_time - p->burst_time; // calculate waiting time and update total count
         completed_processes++;
       }
     } else current_time++; // if ready queue is empty, move to the next time unit
