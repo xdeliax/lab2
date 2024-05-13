@@ -160,6 +160,50 @@ int main(int argc, char *argv[])
   u32 total_response_time = 0;
 
   /* Your code here */
+  u32 current_time = 0;
+  u32 completed_processes = 0;
+    
+  while (completed_processes < size) 
+  {
+    for (u32 i = 0; i < size; ++i) // add arrived processes to the ready queue
+    {
+      if (data[i].arrival_time <= current_time && data[i].remaining_time > 0) 
+      {
+            TAILQ_INSERT_TAIL(&list, &data[i], pointers); // add processes to ready queue
+      }
+    }
+        
+    if (!TAILQ_EMPTY(&list)) // if ready queue isn't empty
+    {
+      struct process *p = TAILQ_FIRST(&list);
+      TAILQ_REMOVE(&list, p, pointers);
+            
+      if (p->remaining_time == p->burst_time) // if running process for the first time
+      {
+        p->response_time = current_time - p->arrival_time; // calculate response time
+      }
+            
+      u32 execution_time;
+      if (p->remaining_time < quantum_length) // if you can finish said process in the given time slice
+        execution_time = p->remaining_time;
+      else execution_time = quantum_length; // or not
+
+      p->remaining_time -= execution_time; // calculate remaining time after this slice
+      current_time += execution_time; // update current time
+            
+      if (p->remaining_time > 0) 
+      {
+        TAILQ_INSERT_TAIL(&list, p, pointers); // add process back to the queue if it hasn't finished
+      } 
+      else // if the process finished
+      {
+        p->waiting_time = current_time - p->arrival_time;
+        total_waiting_time += p->waiting_time;
+        total_response_time += p->response_time;
+        completed_processes++;
+      }
+    } else current_time++; // if ready queue is empty, move to the next time unit
+  }
   
   /* End of "Your code here" */
 
