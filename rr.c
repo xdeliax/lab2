@@ -199,7 +199,7 @@ int main(int argc, char *argv[])
         current_time++;
         p->remaining_time --;
       }
-      if (p->running_at_a_time == 0 || p->remaining_time == 0) // finished the time slice or finished the whole process
+      else if (p->running_at_a_time == 0 || p->remaining_time == 0) // finished the time slice or finished the whole process
       {
         if (p->remaining_time > 0) // if the process didn't finish
         {
