@@ -196,10 +196,10 @@ int main(int argc, char *argv[])
       if (p->running_at_a_time > 0)
       {
         p->running_at_a_time --; // run for one time slice
-        current_time+;
+        current_time++;
         p->remaining_time --;
       }
-      else if (p->running_at_a_time = 0) // finished the time slice
+      else if (p->running_at_a_time == 0) // finished the time slice
       {
         if (p->remaining_time > 0) // if the process didn't finish
         {
