@@ -21,6 +21,7 @@ struct process
   TAILQ_ENTRY(process) pointers;
 
   /* Additional fields here */
+  u32 remaining_time;
   /* End of "Additional fields here" */
 };
 
@@ -162,6 +163,11 @@ int main(int argc, char *argv[])
   /* Your code here */
   u32 current_time = 0;
   u32 completed_processes = 0;
+
+  for (u32 i = 0; i < size; ++i)
+  {
+    data[i].remaining_time = data[i].burst_time; // initialize remaining time for all processes
+  }
     
   while (completed_processes < size) 
   {
@@ -180,7 +186,7 @@ int main(int argc, char *argv[])
             
       if (p->remaining_time == p->burst_time) // if running process for the first time
       {
-        p->response_time = current_time - p->arrival_time; // calculate response time
+        total_response_time += current_time - p->arrival_time; // calculate response time and update total count
       }
             
       u32 execution_time;
@@ -197,9 +203,7 @@ int main(int argc, char *argv[])
       } 
       else // if the process finished
       {
-        p->waiting_time = current_time - p->arrival_time;
-        total_waiting_time += p->waiting_time;
-        total_response_time += p->response_time;
+        total_waiting_time += current_time - p->arrival_time; // calculate waiting time and update total count
         completed_processes++;
       }
     } else current_time++; // if ready queue is empty, move to the next time unit
