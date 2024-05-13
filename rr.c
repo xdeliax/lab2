@@ -206,15 +206,15 @@ int main(int argc, char *argv[])
           TAILQ_REMOVE(&list, p, pointers);
           TAILQ_INSERT_TAIL(&list, p, pointers); // add process back to the end of the queue if it hasn't finished
           p->in_queue = 1;
+          p->running_at_a_time = quantum_length; // update new running_at_a_time for this process for next time it runs
         } 
         else // if the process finished
         {
           total_waiting_time += current_time - p->arrival_time - p->burst_time; // calculate waiting time and update total count
           completed_processes++;
-          TAILQ_REMOVE(&list, p, pointers); // remove from queue
           p->in_queue = 0;
+          TAILQ_REMOVE(&list, p, pointers); // remove from queue
         }
-        p->running_at_a_time = quantum_length; // update new running_at_a_time for this process for next time it runs
       }
             
     } else current_time++; // if ready queue is empty, move to the next time unit
